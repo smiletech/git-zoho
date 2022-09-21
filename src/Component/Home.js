@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { FaFilter } from "react-icons/fa";
-import TolList from "./TolList";
-
 
 var Data=JSON.parse(localStorage.getItem("AllToll")) || [];
 var Toll_Data=JSON.parse(localStorage.getItem("TollData")) || [];
@@ -13,8 +11,6 @@ function Home() {
   const [Search, setSearch] = useState("");
   const [SearchToll, setSearchToll] = useState("");
  
-
-
   const [modelvehicle, setmodelvehicle] = useState(false);
   const [Toll_List, setToll_List] = useState(true);
   const [TollData, setTollData] = useState(JSON.parse(localStorage.getItem("TollData")) || []);
@@ -53,11 +49,9 @@ const [tollname, settollname] = useState("")
     }
   ]);
 
-
-
   useEffect(() => {
     Data= JSON.parse(localStorage.getItem("AllToll")) || [];
-    setAllData(Data);
+    // setAllData(Data);
   }, [Newtoll,VehicleEntery,count]);
 
 
@@ -76,17 +70,19 @@ const ReturnJourney=(data,index)=>{
 }
 
 const on_submit=()=>{
-  console.log(Newtoll);
-  const LocalData= JSON.parse(localStorage.getItem("AllToll")) || [];
+    if(tollname)
+  {
+  
+    const LocalData= JSON.parse(localStorage.getItem("AllToll")) || [];
     LocalData.push({tollname,Newtoll});
     localStorage.setItem("AllToll", JSON.stringify(LocalData));
     console.log(LocalData)
-    
+
      setNewtoll('');
      settollname('');
      setclose(!close);
      setcount(()=>count+1);
-
+}
 }
 
 const submit_Toll=()=>{
@@ -134,12 +130,12 @@ const SearchTollHnd=(data)=>{
   setSearchToll(data);
   const Allarray=JSON.parse(localStorage.getItem("AllToll")) || []
   console.log(Allarray);
-  // const ArrayS=Allarray.filter((newdata,index)=>newdata.vehicleNumber===data)
-  //  if(ArrayS.length>0)
-  // setTollData(ArrayS);
-  // else
-  // setTollData(Allarray);
-  // setcount(()=>count+1);
+  const ArrayS=Allarray.filter((newdata,index)=>newdata.tollname==data)
+   if(ArrayS.length>0)
+  setAllData(ArrayS);
+  else
+  setAllData(Allarray);
+  setcount(()=>count+1);
 
 }
 
@@ -427,9 +423,10 @@ const Vehicle_hnd=(data)=>{
                 <input
                   className="journey-vehicle"
                   type="text"
+                  maxlength="10"
                   placeholder="Enter Vehicle Number"
                   value={VehicleEntery.vehicleNumber}
-                  onChange={(e)=>setVehicleEntery({...VehicleEntery,vehicleNumber:e.target.value})}
+                  onChange={(e)=>setVehicleEntery({...VehicleEntery,vehicleNumber:e.target.value.toUpperCase()})}
                 ></input>
 
                 <p>
@@ -485,7 +482,36 @@ const Vehicle_hnd=(data)=>{
 
 }
 </tbody>
-        </table>:<TolList/>
+        </table>:<table className="table">
+    <thead>     
+  <tr className="table_header">
+  <th>Toll Name</th>
+    <th>CAR/JEEP/VAN</th>
+    <th> LCV</th>
+    <th> TRUCK/BUS</th>
+    <th>HEAVY VEHICLES</th>
+
+  </tr>
+  </thead>
+  <tbody>
+  {
+    AllData?.map((data,i)=>(
+    <tr key={i} className="table-content" >
+      <td>{data.tollname}</td>
+     {
+      data.Newtoll.map((ele,ind)=>{
+        if(ele.vehicleType==="Car/Jeep/Van")  return(<td>{ele.single} / {ele.return}</td>)
+        if(ele.vehicleType==="LCV")  return(<td>{ele.single} / {ele.return} </td>)
+        if(ele.vehicleType==="Truck/Bus")  return(<td>{ele.single} / {ele.return} </td>)
+        if(ele.vehicleType==="Heavy vehicle")  return(<td>{ele.single} / {ele.return} </td>)    
+})
+      }
+            </tr>
+
+      ))
+  }
+  </tbody>
+          </table>
         
       }
 

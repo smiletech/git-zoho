@@ -8,7 +8,9 @@ function TolList() {
     }, [])
     
   return (
-    <div> <table className="table">
+    <div> 
+      
+      <table className="table">
     <thead>     
   <tr className="table_header">
   <th>Toll Name</th>
@@ -19,7 +21,6 @@ function TolList() {
 
   </tr>
   </thead>
-  
   <tbody>
   {
     Data.map((data,i)=>(
