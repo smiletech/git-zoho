@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { FaExpandArrowsAlt, FaFilter } from "react-icons/fa";
+import { FaFilter } from "react-icons/fa";
 import TolList from "./TolList";
 
 
 var Data=JSON.parse(localStorage.getItem("AllToll")) || [];
-var TollData=JSON.parse(localStorage.getItem("TollData")) || [];
-
+var Toll_Data=JSON.parse(localStorage.getItem("TollData")) || [];
 
 function Home() {
   const [count, setcount] = useState(0);
@@ -13,13 +12,10 @@ function Home() {
   const [pop, setpop] = useState(false);
   const [modelvehicle, setmodelvehicle] = useState(false);
   const [Toll_List, setToll_List] = useState(true);
+  const [TollData, setTollData] = useState(JSON.parse(localStorage.getItem("TollData")) || []);
+
   const [AllData, setAllData] = useState();
-
-
-
-  // value 
-
-  const [ VehicleEntery,setVehicleEntery ] = useState(
+ const [ VehicleEntery,setVehicleEntery ] = useState(
     {
       vehicleType:""
       ,vehicleNumber:""
@@ -28,7 +24,6 @@ function Home() {
       ,tariff:""
     }
   );
-
 const [tollname, settollname] = useState("")
   const [ Newtoll,setNewtoll ] = useState([
     {
@@ -53,22 +48,17 @@ const [tollname, settollname] = useState("")
     }
   ]);
 
-
   useEffect(() => {
    Data= JSON.parse(localStorage.getItem("AllToll")) || [];
-   TollData=JSON.parse(localStorage.getItem("TollData")) || [];
+   setTollData(Toll_Data);
    setAllData(Data);
 
   }, [Newtoll,count,VehicleEntery]);
-
-
   
   const set_New_toll=(data,index)=>{
     Newtoll[index].vehicleType=data;
      setNewtoll(Newtoll)
   }
-
-
 const singleJourney=(data,index)=>{
   Newtoll[index].single=data;
   setNewtoll(Newtoll)
@@ -105,8 +95,11 @@ if(VehicleEntery.tariff && VehicleEntery.vehicleNumber)
 
 const Sorthnd=(data,i)=>{
   console.log(data)
-  console.log(TollData);
-
+ const okay= TollData.filter((newdata,index)=>newdata.tollname===data)
+  // console.log(TollData);
+  console.log(okay);
+  setTollData(TollData);
+setcount(()=>count+1)
   setpop(!pop);
 
 }
@@ -333,6 +326,8 @@ const Vehicle_hnd=(data)=>{
         )}
       </div>
 
+
+{/*Toll  */}
       <div>
         {/* Add  new toll model  */}
         {modelvehicle ? (
@@ -450,5 +445,9 @@ const Vehicle_hnd=(data)=>{
     </div>
   );
 }
+
+
+
+
 
 export default Home;

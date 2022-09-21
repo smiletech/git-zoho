@@ -24,7 +24,6 @@ function TolList() {
   {
     
     Data.map((data,i)=>(
-      <>
     <tr key={i} className="table-content" >
       <td>{data.tollname}</td>
      {
@@ -36,8 +35,7 @@ function TolList() {
 })
       }
             </tr>
-  
-      </>
+
       ))
   
   }
