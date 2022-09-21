@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { FaFilter } from "react-icons/fa";
+import { FaExpandArrowsAlt, FaFilter } from "react-icons/fa";
 import TolList from "./TolList";
 
 
 var Data=JSON.parse(localStorage.getItem("AllToll")) || [];
+var TollData=JSON.parse(localStorage.getItem("TollData")) || [];
+
 
 function Home() {
   const [count, setcount] = useState(0);
-
   const [close, setclose] = useState(false);
   const [pop, setpop] = useState(false);
   const [modelvehicle, setmodelvehicle] = useState(false);
@@ -18,7 +19,7 @@ function Home() {
 
   // value 
 
-  const [ VehicleEntery,setVehicleEntery ] = useState([
+  const [ VehicleEntery,setVehicleEntery ] = useState(
     {
       vehicleType:""
       ,vehicleNumber:""
@@ -26,7 +27,7 @@ function Home() {
       ,tollname:""
       ,tariff:""
     }
-  ]);
+  );
 
 const [tollname, settollname] = useState("")
   const [ Newtoll,setNewtoll ] = useState([
@@ -55,17 +56,13 @@ const [tollname, settollname] = useState("")
 
   useEffect(() => {
    Data= JSON.parse(localStorage.getItem("AllToll")) || [];
-
+   TollData=JSON.parse(localStorage.getItem("TollData")) || [];
    setAllData(Data);
-  }, [Newtoll,count]);
 
-  useEffect(() => {
-  console.log(VehicleEntery)
- } ,[VehicleEntery]);
+  }, [Newtoll,count,VehicleEntery]);
+
 
   
-
-
   const set_New_toll=(data,index)=>{
     Newtoll[index].vehicleType=data;
      setNewtoll(Newtoll)
@@ -76,6 +73,7 @@ const singleJourney=(data,index)=>{
   Newtoll[index].single=data;
   setNewtoll(Newtoll)
  }
+
 const ReturnJourney=(data,index)=>{
   Newtoll[index].return=data;
   setNewtoll(Newtoll)
@@ -93,51 +91,37 @@ const on_submit=()=>{
 }
 
 const submit_Toll=()=>{
-
-  const LocalToll= JSON.parse(localStorage.getItem("TollData")) || [];
+if(VehicleEntery.tariff && VehicleEntery.vehicleNumber)
+{ 
+   const LocalToll= JSON.parse(localStorage.getItem("TollData")) || [];
   LocalToll.push(VehicleEntery);
   localStorage.setItem("TollData", JSON.stringify(LocalToll));
-  console.log(LocalToll)
+   alert("done")
   setVehicleEntery({});
-   setmodelvehicle(!modelvehicle);
-
+  setmodelvehicle(!modelvehicle);
+}
 
 }
 
 const Sorthnd=(data,i)=>{
   console.log(data)
+  console.log(TollData);
+
   setpop(!pop);
 
 }
 
 const Vehicle_hnd=(data)=>{
-  console.log(data);
-
-
-  var currentdate = new Date(); 
-  var datetime =  currentdate.getDate() + "/"
-                  + (currentdate.getMonth()+1)  + "/" 
-                  + currentdate.getFullYear() + "  "  
-                  + currentdate.getHours() + ":"  
-                  + currentdate.getMinutes() + ":" 
-                  + currentdate.getSeconds();
-    
-                 
-                  
+  setVehicleEntery({...VehicleEntery,vehicleType:data})
+   var currentdate = new Date(); 
+  var datetime =  currentdate.getDate() + "/" + (currentdate.getMonth()+1)  + "/"  + currentdate.getFullYear() + "  "   + currentdate.getHours() + ":"   + currentdate.getMinutes() + ":"  + currentdate.getSeconds();
   AllData.map((ele,index)=>{
-    if(ele.Newtoll[index].vehicleType===data)
-    {
-      VehicleEntery.tollname=ele.tollname;
-      VehicleEntery.date=datetime;
-      VehicleEntery.tariff=ele.Newtoll[index].single
-    }
-
-  });
-  VehicleEntery.vehicleType=data;
-
-  setVehicleEntery(VehicleEntery);
- setcount(()=>count+1);
-
+        ele.Newtoll.map((each,index)=>{
+          if(each.vehicleType===data && ele.tollname===VehicleEntery.tollname )
+          setVehicleEntery({...VehicleEntery,date:datetime,vehicleType:data,tariff:each.single})
+        });
+      });
+    setcount(()=>count+1);
 }
 
   const popmenu = () => {
@@ -160,11 +144,13 @@ const Vehicle_hnd=(data)=>{
     );
   };
 
+
   return (
     <div>
       <div className="title">
         <h1>Toll Management Application</h1>
       </div>
+
       <hr />
       <div className="toll_nav">
        
@@ -361,10 +347,26 @@ const Vehicle_hnd=(data)=>{
 
               <h2 className="h2-title">Add New Entry</h2>
               <div className="Vehicle_div">
+              <p>
+                  {" "}
+                 Select Toll Name <span className="astik">*</span>{" "}
+                </p>
+                
+                <select className="journey-vehicle"
+                value={VehicleEntery.tollname}
+                onChange={(e) =>setVehicleEntery(({...VehicleEntery,tollname:e.target.value}))}               >
+                  <option value="0">Select Toll Name</option>
+                  {
+                    AllData?.map((ele,i)=>(
+                      <option key={i} value={ele.tollname}>{ele.tollname}</option>
+                    ))
+                  }
+                </select>
                 <p>
                   {" "}
                   Vehicle type <span className="astik">*</span>{" "}
                 </p>
+
                 <select className="journey-vehicle"
                 value={VehicleEntery.vehicleType}
                 onChange={(e) => Vehicle_hnd(e.target.value)}
@@ -384,7 +386,7 @@ const Vehicle_hnd=(data)=>{
                   type="text"
                   placeholder="Enter Vehicle Number"
                   value={VehicleEntery.vehicleNumber}
-                  onChange={(e)=>{setVehicleEntery({...VehicleEntery} , VehicleEntery.vehicleNumber=e.target.value)}}
+                  onChange={(e)=>setVehicleEntery({...VehicleEntery,vehicleNumber:e.target.value})}
                 ></input>
 
                 <p>
@@ -427,18 +429,15 @@ const Vehicle_hnd=(data)=>{
 <tbody>
 {
   
-  Data?.map((data,i)=>(
-    <>
+  TollData?.map((data,i)=>(
     
   <tr key={i} className="tablecontent" >
+    <td>{data.vehicleType}</td>
+    <td>{data.vehicleNumber}</td>
+    <td>{data.date}</td>
     <td>{data.tollname}</td>
-    <td>data</td>
-    <td>"data"</td>
-    <td>"data"</td>
-    <td>"data"</td>
+    <td>{data.tariff}</td>
     </tr>
-
-    </>
     ))
 
 }
