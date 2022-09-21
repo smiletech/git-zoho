@@ -10,6 +10,11 @@ function Home() {
   const [count, setcount] = useState(0);
   const [close, setclose] = useState(false);
   const [pop, setpop] = useState(false);
+  const [Search, setSearch] = useState("");
+  const [SearchToll, setSearchToll] = useState("");
+ 
+
+
   const [modelvehicle, setmodelvehicle] = useState(false);
   const [Toll_List, setToll_List] = useState(true);
   const [TollData, setTollData] = useState(JSON.parse(localStorage.getItem("TollData")) || []);
@@ -48,13 +53,14 @@ const [tollname, settollname] = useState("")
     }
   ]);
 
-  useEffect(() => {
-   Data= JSON.parse(localStorage.getItem("AllToll")) || [];
-   setTollData(Toll_Data);
-   setAllData(Data);
 
-  }, [Newtoll,count,VehicleEntery]);
-  
+
+  useEffect(() => {
+    Data= JSON.parse(localStorage.getItem("AllToll")) || [];
+    setAllData(Data);
+  }, [Newtoll,VehicleEntery,count]);
+
+
   const set_New_toll=(data,index)=>{
     Newtoll[index].vehicleType=data;
      setNewtoll(Newtoll)
@@ -70,13 +76,16 @@ const ReturnJourney=(data,index)=>{
 }
 
 const on_submit=()=>{
+  console.log(Newtoll);
   const LocalData= JSON.parse(localStorage.getItem("AllToll")) || [];
     LocalData.push({tollname,Newtoll});
     localStorage.setItem("AllToll", JSON.stringify(LocalData));
     console.log(LocalData)
-    setNewtoll('');
-    settollname('');
+    
+     setNewtoll('');
+     settollname('');
      setclose(!close);
+     setcount(()=>count+1);
 
 }
 
@@ -90,17 +99,47 @@ if(VehicleEntery.tariff && VehicleEntery.vehicleNumber)
   setVehicleEntery({});
   setmodelvehicle(!modelvehicle);
 }
+setcount(()=>count+1);
 
 }
 
 const Sorthnd=(data,i)=>{
-  console.log(data)
- const okay= TollData.filter((newdata,index)=>newdata.tollname===data)
-  // console.log(TollData);
-  console.log(okay);
-  setTollData(TollData);
-setcount(()=>count+1)
+  const Allarray=JSON.parse(localStorage.getItem("TollData")) || []
+  if(data==='All')
+{  setTollData(Allarray);}
+else
+{ const okay= Allarray.filter((newdata,index)=>newdata.tollname===data)
+  setTollData(okay);
+}
+  setcount(()=>count+1)
   setpop(!pop);
+
+}
+ 
+
+
+const SearchHnd=(data)=>{
+    setSearch(data);
+  const Allarray=JSON.parse(localStorage.getItem("TollData")) || []
+   const ArrayS=Allarray.filter((newdata,index)=>newdata.vehicleNumber===data)
+   if(ArrayS.length>0)
+  setTollData(ArrayS);
+  else
+  setTollData(Allarray);
+  setcount(()=>count+1);
+}
+
+
+const SearchTollHnd=(data)=>{
+  setSearchToll(data);
+  const Allarray=JSON.parse(localStorage.getItem("AllToll")) || []
+  console.log(Allarray);
+  // const ArrayS=Allarray.filter((newdata,index)=>newdata.vehicleNumber===data)
+  //  if(ArrayS.length>0)
+  // setTollData(ArrayS);
+  // else
+  // setTollData(Allarray);
+  // setcount(()=>count+1);
 
 }
 
@@ -108,6 +147,7 @@ const Vehicle_hnd=(data)=>{
   setVehicleEntery({...VehicleEntery,vehicleType:data})
    var currentdate = new Date(); 
   var datetime =  currentdate.getDate() + "/" + (currentdate.getMonth()+1)  + "/"  + currentdate.getFullYear() + "  "   + currentdate.getHours() + ":"   + currentdate.getMinutes() + ":"  + currentdate.getSeconds();
+ 
   AllData.map((ele,index)=>{
         ele.Newtoll.map((each,index)=>{
           if(each.vehicleType===data && ele.tollname===VehicleEntery.tollname )
@@ -116,6 +156,7 @@ const Vehicle_hnd=(data)=>{
       });
     setcount(()=>count+1);
 }
+
 
   const popmenu = () => {
     return (
@@ -160,13 +201,20 @@ const Vehicle_hnd=(data)=>{
             <FaFilter />
           </span>
           <div className="search-div">
-            <input type="search" placeholder="Search vehicle"></input>
+            <input type="search" placeholder="Search vehicle" 
+             value={Search}
+             onChange={(e)=>SearchHnd(e.target.value)}
+
+            ></input>
           </div>
         </div>:<div className="firstSearch">
-          <h3>Toll entries/Vehicle entries</h3>
+          <h3>Toll gate List</h3>
           <span>|</span>
           <div className="search-div">
-            <input type="search" placeholder="Search  Toll "></input>
+            <input type="search" placeholder="Search  Toll "
+             value={SearchToll}
+             onChange={(e)=>SearchTollHnd(e.target.value)}
+            ></input>
           </div>
         </div>}
 
